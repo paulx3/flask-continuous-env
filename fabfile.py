@@ -15,7 +15,7 @@ env.hosts = ['HOST1', 'HOST2']  # cmd: fab -H HOST1,HOST2
 env.LIVE_SERVER_URL = 'example.com'
 env.NEXT_SERVER_URL = 'next.example.com'
 """
-env.user = 'admin'
+env.user = 'root'
 
 # from http://strikeawe.com/blog/2011/08/install-nodejs-npm-and-less-non-interactively
 CMD_INSTALL_NODE_AND_PACKAGES = """export skipclean=1
