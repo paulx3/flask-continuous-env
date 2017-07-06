@@ -1,4 +1,5 @@
 # Continuous Integration and Deployment with Flask & Travis CI
+
 Build environment for Flask development with Grunt for frontend development.  
 Testing and integration handled by Travis CI. 
 Zero-downtime deployment stack with Nginx and Gunicorn, configured easily with Fabric locally or from Travis CI. 
