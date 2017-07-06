@@ -29,67 +29,6 @@ def nginx(action):
     sudo('/etc/init.d/nginx %s' % action, pty=False)
 
 
-def install_requirements():
-    """
-    1. Install packages
-    2. Install nodejs & npm packages (bower and less)
-    3. Update pip
-    4. Install virtualenv from pip
-
-    NOTE: For Ubuntu Server: (untested)
-        1. Add 'nodejs' to linux_packages
-        2. Comment out sudo(CMD_INSTALL_NODE_PACKAGES)
-        3. Add line: `sudo('export skipclean=1')`
-        4. Add line: `sudo('npm install -g less -g bower')`
-    """
-    linux_packages = ['python', 'python-pip', 'nginx', 'git', 'curl']
-    sudo('apt-get install -y ' + ' '.join(linux_packages))
-    sudo(CMD_INSTALL_NODE_AND_PACKAGES)
-    sudo('pip install --upgrade pip')
-    sudo('pip install virtualenv')
-
-
-def configure_nginx():
-    """
-    1. Remove default nginx config file
-    2. Create new config file
-    3. Setup new symbolic link
-    4. Copy local config to remote config
-    5. Make directories and empty config files for /live and /next config.
-    6. Restart nginx
-    """
-    # End step 1
-    nginx('start')
-    sudo('rm -rf /etc/nginx/sites-enabled/default')
-    sudo('touch /etc/nginx/sites-available/flask_site')
-    sudo('ln -s /etc/nginx/sites-available/flask_site /etc/nginx/sites-enabled/flask_site')
-    with cd('/etc/nginx/sites-available/'):
-        with open(os.path.join('deploy', 'nginx.conf')) as f:  # Get local nginx config script
-            put(StringIO(f.read() % env), './flask_site', use_sudo=True)
-    # Step 5
-    run('mkdir -p /home/%(user)s/blue-green/live/etc/' % env)
-    run('mkdir -p /home/%(user)s/blue-green/next/etc/' % env)
-    run('touch /home/%(user)s/blue-green/live/etc/nginx.conf' % env)
-    run('touch /home/%(user)s/blue-green/next/etc/nginx.conf' % env)
-    sudo('chown -R %(user)s:%(user)s /home/%(user)s/blue-green' % env)  # Shouldn't be necessary, but just in case.
-    # End step 5
-    nginx('restart')
-
-
-def configure_flask():
-    run('mkdir -p %(config_path)s' % env)
-    with cd('%(config_path)s' % env):
-        with open(os.path.join('flask_site', 'config', 'config.yml')) as f:  # Get local flask config.yml
-            put(StringIO(f.read()), 'config.yml')
-
-
-@task
-def setup_machine():
-    install_requirements()
-    configure_nginx()
-    configure_flask()
-
-
 def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-style path separators
     require('bluegreen_root', 'bluegreen_ports')
     env.green_path = env.bluegreen_root + '/green'
@@ -113,52 +52,61 @@ def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-st
 
 @task
 def prod():
+    """
+    生成路径信息
+    :return:
+    """
     if 'TRAVIS' in env and env.TRAVIS and env.TRAVIS_BRANCH != 'master':
         abort("Don't deploy from Travis unless it's from the master branch.")
+    # 制定虚拟环境目录
     env.virtualenv_path = 'env'
+    # 指定blue-green的路径
     env.bluegreen_root = '/home/%(user)s/blue-green' % env
+    # 指定config的路径
     env.config_path = env.bluegreen_root + '/config'
+    # 指定端口
     env.bluegreen_ports = {'blue': '8888', 'green': '8889'}
+    # 初始化
     init_bluegreen()
 
 
 def launch():
+    # 根据pid文件删除进程
     run('kill $(cat %(pidfile)s) || true' % env)
+    # 删除旧的虚拟环境
     run('rm -rf %(virtualenv_path)s' % env)  # Clear out old virtualenv for new one.
+    # 创建新的虚拟环境
     run('virtualenv %(virtualenv_path)s' % env)
+    #
     put(StringIO('proxy_pass http://127.0.0.1:%(bluegreen_port)s/;' % env), env.nginx_conf)
     # run('cp %(repo_path)s/flask_site/config/config.yml %(config_path)s/config.yml' % env)
     with prefix('. %(virtualenv_path)s/bin/activate' % env), cd('%(repo_path)s' % env):
         run('pip install -r requirements.txt')
         run('pip install --ignore-installed gunicorn')
-        run('bower install')
+        # run('bower install')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
             '--access-logfile access.log --error-logfile error.log flask_site:app' % env, pty=False)
 
 
 @task
-def deploy(commit=None):
-    if commit is None:
-        commit = local('git rev-parse HEAD', capture=True)
-    env.repo_path = env.next_path + '/repo'
-    insert_public_key()  # Done so that git push can operate without asking for password
-    git_seed(env.repo_path, commit)
-    git_reset(env.repo_path, commit)
-    launch()
-    remove_public_key()  # Security reasons
-
-
-@task
 def deploy_from_travis():
+    # 在next的目录下的repo文件夹
     env.repo_path = env.next_path + '/repo'
+    # 删掉之前可能存在的文件夹
     run('rm -rf %(repo_path)s' % env)
+    # 创建新的next下的repo文件夹
     run('mkdir %(repo_path)s' % env)
+    # 将打包的文件命名为 deploy.tgz
     archive_name = 'deploy.tgz'
+    # 调用pack函数进行打包，并返回本地打包文件的地址
     local_archive_path = pack(archive_name)  # Create tgz from local files
+    # 将本地的打包文件传到服务器
     put(local_archive_path, env.repo_path)  # Upload to deployment server
+    # 进入这个对应的文件夹并进行解压
     with cd(env.repo_path):
         run('tar xzf %s' % archive_name)  # Untar them to /repo
+    # 启动部署
     launch()
 
 
@@ -170,26 +118,6 @@ def pack(archive_name):
     local('mkdir tmp')
     local('tar czf %s --exclude=tmp .' % archive_path)
     return archive_path
-
-
-def insert_public_key():
-    if 'SSH_PUB_KEY' in env:
-        public_key = env.PUB_KEY
-    elif 'SSH_PUB_KEY_FILE' in env:
-        with open(env.SSH_PUB_KEY_FILE) as f:
-            public_key = f.read()
-    else:
-        public_key = ''  # Will prompt for git pass on push.
-    if not exists('~/.ssh/authorized_keys'):
-        run('mkdir -p ~/.ssh/')
-        run('touch ~/.ssh/authorized_keys')
-        run('chmod 600 ~/.ssh/authorized_keys')
-    run('cp -a ~/.ssh/authorized_keys ~/.ssh/authorized_keys.tmp')
-    append('~/.ssh/authorized_keys', public_key)
-
-
-def remove_public_key():
-    run('mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys')
 
 
 @task
