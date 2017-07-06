@@ -11,7 +11,6 @@ default: &default
         username: root
         password:
 
-
 test:  # Same as development and default.
     <<: *default
 
