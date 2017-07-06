@@ -127,7 +127,7 @@ def launch():
     run('rm -rf %(virtualenv_path)s' % env)  # Clear out old virtualenv for new one.
     run('virtualenv %(virtualenv_path)s' % env)
     put(StringIO('proxy_pass http://127.0.0.1:%(bluegreen_port)s/;' % env), env.nginx_conf)
-    run('cp %(config_path)s/config.yml %(repo_path)s/flask_site/config/config.yml' % env)
+    run('cp %(repo_path)s/flask_site/config/config.yml %(config_path)s/config.yml' % env)
     with prefix('. %(virtualenv_path)s/bin/activate' % env), cd('%(repo_path)s' % env):
         run('pip install -r requirements.txt')
         run('pip install --ignore-installed gunicorn')
