@@ -3,10 +3,9 @@ python:
 - '2.7'
 install:
 - pip install -r requirements.txt
+script: python test.py
 before_deploy:
-- pip install gitric
-- pip install -e git+https://github.com/paramiko/paramiko/#egg=paramiko
-- pip install -e git+https://github.com/fabric/fabric/#egg=fabric
+- pip install fabric gitric
 deploy:
   provider: script
   script: fab -H $DEPLOY_HOSTS -p $DEPLOY_PASS prod deploy_from_travis cutover
