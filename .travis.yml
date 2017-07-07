@@ -8,7 +8,7 @@ install:
 #- cp flask_site/config/config_sample.yml flask_site/config/config.yml
 script: nosetests --with-xunit --with-xcoverage --cover-package=flask_site --cover-erase tests
 before_deploy:
-#- pip install fabric gitric
+- pip install gitric
 - pip install -e git+https://github.com/paramiko/paramiko/#egg=paramiko
 - pip install -e git+https://github.com/fabric/fabric/#egg=fabric
 deploy:
