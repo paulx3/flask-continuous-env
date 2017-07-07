@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
-from StringIO import StringIO
+from io import StringIO
 
 from fabric.api import cd, put, local, sudo, task, run, require, prefix
 from fabric.contrib.files import exists, append
