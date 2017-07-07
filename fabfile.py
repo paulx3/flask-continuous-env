@@ -18,12 +18,6 @@ env.NEXT_SERVER_URL = 'next.example.com'
 """
 env.user = 'root'
 
-# from http://strikeawe.com/blog/2011/08/install-nodejs-npm-and-less-non-interactively
-CMD_INSTALL_NODE_AND_PACKAGES = """export skipclean=1
-curl -sL https://deb.nodesource.com/setup_0.12 | sudo -E bash -
-apt-get install -y nodejs
-npm install -g less -g bower"""
-
 
 def nginx(action):
     # pty=False, here's why: http://www.fabfile.org/faq.html#init-scripts-don-t-work
