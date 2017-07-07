@@ -51,7 +51,8 @@ def install_requirements():
     2. Update pip
     3. Install virtualenv from pip
     """
-    linux_packages = ['python', 'python-pip', 'nginx', 'git', 'curl']
+    sudo('apt-get update')
+    linux_packages = ['python3', 'python-pip', 'nginx', 'git', 'curl']
     sudo('apt-get install -y ' + ' '.join(linux_packages))
     sudo('pip install --upgrade pip')
     sudo('pip install virtualenv')
