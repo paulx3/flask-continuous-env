@@ -45,6 +45,45 @@ def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-st
     env.bluegreen_port = env.bluegreen_ports.get(env.color)
 
 
+def install_requirements():
+    """
+    1. Install packages
+    2. Update pip
+    3. Install virtualenv from pip
+    """
+    linux_packages = ['python', 'python-pip', 'nginx', 'git', 'curl']
+    sudo('apt-get install -y ' + ' '.join(linux_packages))
+    sudo('pip install --upgrade pip')
+    sudo('pip install virtualenv')
+
+
+def configure_nginx():
+    """
+    1. Remove default nginx config file
+    2. Create new config file
+    3. Setup new symbolic link
+    4. Copy local config to remote config
+    5. Make directories and empty config files for /live and /next config.
+    6. Restart nginx
+    """
+    # End step 1
+    nginx('start')
+    sudo('rm -rf /etc/nginx/sites-enabled/default')
+    sudo('touch /etc/nginx/sites-available/flask_site')
+    sudo('ln -s /etc/nginx/sites-available/flask_site /etc/nginx/sites-enabled/flask_site')
+    with cd('/etc/nginx/sites-available/'):
+        with open(os.path.join('deploy', 'nginx.conf')) as f:  # Get local nginx config script
+            put(StringIO(f.read() % env), './flask_site', use_sudo=True)
+    # Step 5
+    run('mkdir -p /home/%(user)s/blue-green/live/etc/' % env)
+    run('mkdir -p /home/%(user)s/blue-green/next/etc/' % env)
+    run('touch /home/%(user)s/blue-green/live/etc/nginx.conf' % env)
+    run('touch /home/%(user)s/blue-green/next/etc/nginx.conf' % env)
+    sudo('chown -R %(user)s:%(user)s /home/%(user)s/blue-green' % env)  # Shouldn't be necessary, but just in case.
+    # End step 5
+    nginx('restart')
+
+
 @task
 def prod():
     """
@@ -72,13 +111,12 @@ def launch():
     run('rm -rf %(virtualenv_path)s' % env)  # Clear out old virtualenv for new one.
     # 创建新的虚拟环境
     run('virtualenv %(virtualenv_path)s' % env)
-    #
+    # 将这条记录传到配置中
     put(StringIO('proxy_pass http://127.0.0.1:%(bluegreen_port)s/;' % env), env.nginx_conf)
     # run('cp %(repo_path)s/flask_site/config/config.yml %(config_path)s/config.yml' % env)
     with prefix('. %(virtualenv_path)s/bin/activate' % env), cd('%(repo_path)s' % env):
         run('pip install -r requirements.txt')
         run('pip install --ignore-installed gunicorn')
-        # run('bower install')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
             '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
@@ -86,6 +124,8 @@ def launch():
 
 @task
 def deploy_from_travis():
+    install_requirements()
+    configure_nginx()
     # 在next的目录下的repo文件夹
     env.repo_path = env.next_path + '/repo'
     # 删掉之前可能存在的文件夹
@@ -109,13 +149,18 @@ def pack(archive_name):
     """
     Method to package a directory for deployment, returns local path of archive.
     """
+    # 打包目录
     archive_path = 'tmp/' + archive_name
+    # 删除tmp
     local('mkdir tmp')
+    # 打包
     local('tar czf %s --exclude=tmp .' % archive_path)
     return archive_path
 
 
 @task
 def cutover():
+    # blue_green切换
     swap_bluegreen()
+    # reload nginx
     nginx('reload')
