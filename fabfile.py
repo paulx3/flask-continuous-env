@@ -21,7 +21,7 @@ env.user = 'root'
 
 def nginx(action):
     # pty=False, here's why: http://www.fabfile.org/faq.html#init-scripts-don-t-work
-    sudo('/etc/init.d/nginx %s' % action, pty=False)
+    sudo('/etc/init.d/nginx %s' % action, pty=True)
 
 
 def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-style path separators
@@ -81,7 +81,7 @@ def launch():
         # run('bower install')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
-            '--access-logfile access.log --error-logfile error.log flask_site:app' % env, pty=False)
+            '--access-logfile access.log --error-logfile error.log flask_site:app' % env, pty=True)
 
 
 @task
