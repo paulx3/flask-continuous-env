@@ -17,6 +17,8 @@ env.LIVE_SERVER_URL = 'example.com'
 env.NEXT_SERVER_URL = 'next.example.com'
 """
 env.user = 'root'
+env.LIVE_SERVER_URL = 'example.com'
+env.NEXT_SERVER_URL = 'next.example.com'
 
 
 def nginx(action):
