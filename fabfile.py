@@ -119,11 +119,12 @@ def launch():
     # run('cp %(repo_path)s/flask_site/config/config.yml %(config_path)s/config.yml' % env)
     with prefix('. %(virtualenv_path)s/bin/activate' % env), cd('%(repo_path)s' % env):
         run('pip3 install -r requirements.txt')
-        run('pip3 install --ignore-installed gunicorn')
+        run('pip3 install gunicorn')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
         # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
-        run('gunicorn -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s  app:app' % env, pty=True)
+        run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s --error-logfile error.log app:app' % env,
+            pty=True)
 
 
 @task
