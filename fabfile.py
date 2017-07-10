@@ -122,7 +122,7 @@ def launch():
         run('pip3 install --ignore-installed gunicorn')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
-            # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
+        # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s  app:app' % env, pty=True)
 
 
@@ -165,6 +165,6 @@ def pack(archive_name):
 @task
 def cutover():
     # blue_green切换
-    swap_bluegreen()
+    # swap_bluegreen()
     # reload nginx
     nginx('reload')
