@@ -50,14 +50,14 @@ def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-st
 def install_requirements():
     """
     1. Install packages
-    2. Update pip
+    2. Update pip3
     3. Install virtualenv from pip
     """
     sudo('apt-get update')
-    linux_packages = ['python3', 'python-pip', 'nginx', 'git', 'curl']
+    linux_packages = ['python3', 'python3-pip', 'nginx', 'git', 'curl']
     sudo('apt-get install -y ' + ' '.join(linux_packages))
-    sudo('pip install --upgrade pip')
-    sudo('pip install virtualenv')
+    sudo('pip3 install --upgrade pip')
+    sudo('pip3 install virtualenv')
 
 
 def configure_nginx():
@@ -118,8 +118,8 @@ def launch():
     put(StringIO('proxy_pass http://127.0.0.1:%(bluegreen_port)s/;' % env), env.nginx_conf)
     # run('cp %(repo_path)s/flask_site/config/config.yml %(config_path)s/config.yml' % env)
     with prefix('. %(virtualenv_path)s/bin/activate' % env), cd('%(repo_path)s' % env):
-        run('pip install -r requirements.txt')
-        run('pip install --ignore-installed gunicorn')
+        run('pip3 install -r requirements.txt')
+        run('pip3 install --ignore-installed gunicorn')
         # pty=False for last command since pseudo-terminals can't spawn daemons
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
             '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
