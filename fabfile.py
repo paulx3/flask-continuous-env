@@ -57,7 +57,7 @@ def install_requirements():
     linux_packages = ['python3', 'python3-pip', 'nginx', 'git', 'curl']
     sudo('apt-get install -y ' + ' '.join(linux_packages))
     sudo('pip3 install --upgrade pip')
-    sudo('pip3 install virtualenv')
+    sudo('pip3 install --upgrade virtualenv')
 
 
 def configure_nginx():
@@ -168,4 +168,4 @@ def cutover():
     # blue_green切换
     # swap_bluegreen()
     # reload nginx
-    # nginx('reload')
+    nginx('reload')
