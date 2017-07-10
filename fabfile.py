@@ -128,8 +128,8 @@ def launch():
 
 @task
 def deploy_from_travis():
-    # install_requirements()
-    # configure_nginx()
+    install_requirements()
+    configure_nginx()
     # 在next的目录下的repo文件夹
     env.repo_path = env.next_path + '/repo'
     # 删掉之前可能存在的文件夹
