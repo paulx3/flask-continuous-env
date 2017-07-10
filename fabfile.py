@@ -121,8 +121,9 @@ def launch():
         run('pip3 install -r requirements.txt')
         run('pip3 install --ignore-installed gunicorn')
         # pty=False for last command since pseudo-terminals can't spawn daemons
-        run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
-            '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
+        # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
+            # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
+        run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s  app:app' % env, pty=True)
 
 
 @task
