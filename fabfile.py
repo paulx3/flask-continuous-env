@@ -126,7 +126,7 @@ def launch():
         # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
         # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s  app:app' % env,
-            pty=True)
+            pty=False)
 
 
 @task
