@@ -1,6 +1,8 @@
 # Continuous Integration and Deployment with Flask & Travis CI
 
 [![Build Status](https://travis-ci.org/paulx3/flask-continuous-env.svg?branch=master)](https://travis-ci.org/paulx3/flask-continuous-env)
+
+
 This is just a simplification of the original repository. As my project
 is restful server. So I delete the `bower` and `resource` part and some Flask plugins. This repository
 focuses on Travis automatic test and deploy.
