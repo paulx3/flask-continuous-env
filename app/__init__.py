@@ -20,4 +20,4 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello 5-downtime %s World!" % os.environ.get('BLUEGREEN', 'bland')
+    return "Hello 1-downtime %s World!" % os.environ.get('BLUEGREEN', 'bland')
