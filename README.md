@@ -90,3 +90,9 @@ If you don't intend to test the server before going live, you can run the comman
 - For a nice git branching model: http://nvie.com/posts/a-successful-git-branching-model/
 - Because of Flask-Assets, the first user to visit your newly-deployed site will take a long time to load (while resources compile). 
 Circumvent this by visiting `$NEXT_SERVER_URL` before running `fab cutover`
+
+## The Right Order Deploy From Travis
+1. Enable first two lines of `deploy_from_travis()` , namely `install_requirements()`
+and `configure_nginx()`, and commit the first version
+2. For the following versions: Before you commit , you need to comment `install_requirements()`
+and `configure_nginx()` in `deploy_from_travis()`
