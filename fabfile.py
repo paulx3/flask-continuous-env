@@ -23,7 +23,7 @@ env.NEXT_SERVER_URL = 'next.example.com'
 
 def nginx(action):
     # pty=False, here's why: http://www.fabfile.org/faq.html#init-scripts-don-t-work
-    sudo('/etc/init.d/nginx %s' % action, pty=True)
+    sudo('/etc/init.d/nginx %s' % action, pty=False)
 
 
 def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-style path separators
@@ -126,7 +126,7 @@ def launch():
         # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
         # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s  app:app' % env,
-            pty=False)
+            pty=True)
 
 
 @task
