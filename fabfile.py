@@ -23,7 +23,7 @@ env.NEXT_SERVER_URL = 'next.example.com'
 
 def nginx(action):
     # pty=False, here's why: http://www.fabfile.org/faq.html#init-scripts-don-t-work
-    sudo('/etc/init.d/nginx %s' % action, pty=True)
+    sudo('/etc/init.d/nginx %s' % action, pty=False)
 
 
 def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-style path separators
@@ -131,8 +131,8 @@ def launch():
 
 @task
 def deploy_from_travis():
-    # install_requirements()
-    # configure_nginx()
+    install_requirements()
+    configure_nginx()
     # 在next的目录下的repo文件夹
     env.repo_path = env.next_path + '/repo'
     # 删掉之前可能存在的文件夹
@@ -170,4 +170,4 @@ def cutover():
     # blue_green切换
     swap_bluegreen()
     # reload nginx
-    # nginx('reload')
+    nginx('reload')
