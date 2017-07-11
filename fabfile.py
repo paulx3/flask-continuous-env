@@ -126,13 +126,13 @@ def launch():
         # run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s '
         # '--access-logfile access.log --error-logfile error.log app:app' % env, pty=True)
         run('gunicorn -D -b 127.0.0.1:%(bluegreen_port)s -p %(pidfile)s  app:app' % env,
-            pty=True)
+            pty=False)
 
 
 @task
 def deploy_from_travis():
-    install_requirements()
-    configure_nginx()
+    # install_requirements()
+    # configure_nginx()
     # 在next的目录下的repo文件夹
     env.repo_path = env.next_path + '/repo'
     # 删掉之前可能存在的文件夹
