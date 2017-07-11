@@ -47,6 +47,7 @@ def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-st
     env.bluegreen_port = env.bluegreen_ports.get(env.color)
 
 
+@task
 def install_requirements():
     """
     1. Install packages
@@ -60,6 +61,7 @@ def install_requirements():
     sudo('pip3 install --upgrade virtualenv')
 
 
+@task
 def configure_nginx():
     """
     1. Remove default nginx config file
@@ -165,7 +167,6 @@ def pack(archive_name):
 
 @task
 def cutover():
-    pass
     # blue_green切换
     swap_bluegreen()
     # reload nginx
