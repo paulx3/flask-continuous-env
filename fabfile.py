@@ -23,7 +23,7 @@ env.NEXT_SERVER_URL = 'next.example.com'
 
 def nginx(action):
     # pty=False, here's why: http://www.fabfile.org/faq.html#init-scripts-don-t-work
-    sudo('/etc/init.d/nginx %s' % action, pty=False)
+    sudo('/etc/init.d/nginx %s' % action, pty=True)
 
 
 def init_bluegreen():  # Taken from gitric.api, but modified so it uses linux-style path separators
