@@ -167,6 +167,7 @@ def pack(archive_name):
 
 @task
 def cutover():
+    pass
     # blue_green切换
     swap_bluegreen()
     # reload nginx
