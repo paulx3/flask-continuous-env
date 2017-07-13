@@ -4,8 +4,11 @@
 
 
 This is just a simplification of the original repository. As my project
-is restful server. So I delete the `bower` and `resource` part and some Flask plugins. This repository
-focuses on Travis automatic test and deploy.
+is restful a server. So I delete the `bower` and `resource` part. Also I simplified the Flask app to 
+make the problem clearer.If you need to use it,just replace the `app` folder with your app.
+
+
+This repository focuses on Travis automatic test and deploy.
 
 
 Testing and integration handled by Travis CI. 
@@ -39,16 +42,6 @@ skip step 1 of the "Deploy Manually" section.
 - For a nice git branching model: http://nvie.com/posts/a-successful-git-branching-model/
 Circumvent this by visiting `$NEXT_SERVER_URL` before running `fab cutover`
 
-
-## Setup
-1. Install the following:
-    - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (you probably have this already)
-    - [Python](https://www.python.org/) & [pip](https://pip.pypa.io/en/latest/installing.html)
-4. Install virtualenv using `pip install virtualenv` (Note: see [flask virtualenv install docs](http://flask.pocoo.org/docs/0.10/installation/) for more info)
-5. Setup virtualenv:
-    1. Run `virtualenv env`
-    2. On Windows: `env\scripts\activate`; On Linux: `. env/bin/activate`
-6. Install python packages with `pip install -r requirements.txt` (NOTE: Make sure you have activated the python virtualenv prior.)
 
 ## Develop
 - If you install a new python package with pip, run: `pip freeze > requirements.txt`
